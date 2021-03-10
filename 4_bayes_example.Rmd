@@ -1,0 +1,79 @@
+---
+title: "Bayes factor analysis example"
+author: "Holly Zaharchuk"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highligh: github
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+# knitr settings
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+```{r}
+# Load package for calculating Bayes factors
+library(BayesFactor)
+```
+
+The relevant variable names are:
+
+- ID = participant ID number
+- chlabel = electrode or channel labels (e.g., Pz)
+- group = participant group (Unmarked or Southern)
+- cond = sentence condition (DM or SM)
+
+```{r}
+# Convert variables to factors (required by anovaBF function)
+erp_data <- erp_data %>%
+  mutate(ID = as.factor(ID),
+         chlabel = as.factor(chlabel),
+         group = as.factor(group),
+         cond = as.factor(cond))
+```
+
+I calculated BFs corresponding to the four traditional ANOVAs in each time window (2) and distribution (2). Below, I show the calculation for the EAN effect along the midline. [This article](https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057) was incredibly helpful for understanding how to implement the analysis with the `BayesFactor` package, and [this open access article](https://link.springer.com/article/10.3758/s13423-017-1323-7) provides useful information on interpretation. 
+
+```{r}
+# Run Bayesian ANOVA
+# EAN, midline, interaction among electrodes, groups, and conditions
+# anovaBF function also requires random factor for participants
+bf_ean_center <- anovaBF(value ~ group*chlabel*cond + ID, 
+              data = erp_data %>% 
+                dplyr::filter(window == "ean" & 
+                              distribution == "center"),
+              whichModels="withmain",
+              whichRandom = "ID", 
+              iterations = 100000)
+
+# Extract all BFs, calculated for every term/interaction
+bf_ean_center <- extractBF(bf_ean_center) %>%
+  name_rows()
+```
+
+Running a Bayesian ANOVA compares every combination of variables (main effects and interactions) to a null model. As a result, the BFs in this analysis don't tell you anything about the probability of one model relative to another. In order to calculate a BF comparing two models, you need to extract the BFs for the two models you want to compare, and then calculate a ratio. That's it!
+
+```{r}
+# Pull BF of model for tranditional ANOVA (not including group)
+bf_num <- bf_ean_center %>%
+  dplyr::filter(.rownames == "chlabel + cond + chlabel:cond + ID") %>%
+  pull(bf)
+```
+
+```{r}
+# Pull BF of model including group
+bf_den <- bf_ean_center %>%
+  dplyr::filter(.rownames == "chlabel + cond + chlabel:cond + 
+                              group + chlabel:group + cond:group + c
+                              hlabel:cond:group + ID") %>%
+  pull(bf)
+```
+
+The ratio of BFs gives you the probability of the preferred model (numerator) to the dispreferred model (denominator). In other words, if the ratio is 2, that means that the preferred model has a 2-to-1 chance of producing the actually observed data over the dispreferred model. This ratio would be reported as $BF_{10}$, while the opposite ratio would be reported as $BF_{01}$.
+
+```{r}
+# Calculate BF for comparison between models with/without group factor
+bf_ean_center_comp <- bf_num / bf_den
+```
