@@ -34,7 +34,7 @@ erp_data <- erp_data %>%
          cond = as.factor(cond))
 ```
 
-I calculated BFs corresponding to the four traditional ANOVAs in each time window (2) and distribution (2). Below, I show the calculation for the EAN effect along the midline. [This article](https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057) was incredibly helpful for understanding how to implement the analysis with the `BayesFactor` package, and [this open access article](https://link.springer.com/article/10.3758/s13423-017-1323-7) provides useful information on interpretation. 
+I calculated BFs corresponding to the four traditional ANOVAs in each time window (2) and distribution (2). Below, I show the calculation for the EAN effect along the midline. [This article](https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057) was incredibly helpful for understanding how to implement the analysis with the `BayesFactor` package, and [this open access article](https://link.springer.com/article/10.3758/s13423-017-1323-7) provides useful information on interpretation (see Table 1). 
 
 ```{r, eval=FALSE}
 # Run Bayesian ANOVA

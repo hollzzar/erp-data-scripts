@@ -12,7 +12,7 @@
 
 <meta name="author" content="Holly Zaharchuk" />
 
-<meta name="date" content="2021-03-09" />
+<meta name="date" content="2021-03-10" />
 
 <title>Bayes factor analysis example</title>
 
@@ -131,7 +131,7 @@ a.sourceLine {
 <section class="page-header">
 <h1 class="title toc-ignore project-name">Bayes factor analysis example</h1>
 <h4 class="author project-author">Holly Zaharchuk</h4>
-<h4 class="date project-date">March 09, 2021</h4>
+<h4 class="date project-date">March 10, 2021</h4>
 </section>
 
 
@@ -152,7 +152,7 @@ a.sourceLine {
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">chlabel =</span> <span class="fu">as.factor</span>(chlabel),</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">group =</span> <span class="fu">as.factor</span>(group),</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">cond =</span> <span class="fu">as.factor</span>(cond))</span></code></pre></div>
-<p>I calculated BFs corresponding to the four traditional ANOVAs in each time window (2) and distribution (2). Below, I show the calculation for the EAN effect along the midline. <a href="https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057">This article</a> was incredibly helpful for understanding how to implement the analysis with the <code>BayesFactor</code> package, and <a href="https://link.springer.com/article/10.3758/s13423-017-1323-7">this open access article</a> provides useful information on interpretation.</p>
+<p>I calculated BFs corresponding to the four traditional ANOVAs in each time window (2) and distribution (2). Below, I show the calculation for the EAN effect along the midline. <a href="https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057">This article</a> was incredibly helpful for understanding how to implement the analysis with the <code>BayesFactor</code> package, and <a href="https://link.springer.com/article/10.3758/s13423-017-1323-7">this open access article</a> provides useful information on interpretation (see Table 1).</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run Bayesian ANOVA</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># EAN, midline, interaction among electrodes, groups, and conditions</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># anovaBF function also requires random factor for participants</span></span>
