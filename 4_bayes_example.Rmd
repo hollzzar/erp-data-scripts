@@ -13,6 +13,10 @@ output:
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
+I calculated Bayes factors (BFs) corresponding to the four traditional ANOVAs in each time window (EAN, P600) and distribution (midline [Fz, Cz, Pz], lateral [LF, RF, LP, RP]). Below, I show the calculation for the EAN effect along the midline. 
+
+[This article](https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057) was incredibly helpful for understanding how to implement the analysis with the `BayesFactor` package, and [this open access article](https://link.springer.com/article/10.3758/s13423-017-1323-7) provides useful information on interpretation (see Table 1). 
+
 ```{r, eval=FALSE}
 # Load package for calculating Bayes factors
 library(BayesFactor)
@@ -21,9 +25,11 @@ library(BayesFactor)
 The relevant variable names are:
 
 - ID = participant ID number
-- chlabel = electrode or channel labels (e.g., Pz)
+- chlabel = individual electrodes or channels (e.g., Pz)
 - group = participant group (Unmarked or Southern)
 - cond = sentence condition (DM or SM)
+- window = time window (EAN or P600)
+- distribution = group of electrodes or channels (midline, lateral)
 
 ```{r, eval=FALSE}
 # Convert variables to factors (required by anovaBF function)
@@ -33,8 +39,6 @@ erp_data <- erp_data %>%
          group = as.factor(group),
          cond = as.factor(cond))
 ```
-
-I calculated BFs corresponding to the four traditional ANOVAs in each time window (2) and distribution (2). Below, I show the calculation for the EAN effect along the midline. [This article](https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057) was incredibly helpful for understanding how to implement the analysis with the `BayesFactor` package, and [this open access article](https://link.springer.com/article/10.3758/s13423-017-1323-7) provides useful information on interpretation (see Table 1). 
 
 ```{r, eval=FALSE}
 # Run Bayesian ANOVA
@@ -53,10 +57,13 @@ bf_ean_center <- extractBF(bf_ean_center) %>%
   name_rows()
 ```
 
-Running a Bayesian ANOVA compares every combination of variables (main effects and interactions) to a null model. As a result, the BFs in this analysis don't tell you anything about the probability of one model relative to another. In order to calculate a BF comparing two models, you need to extract the BFs for the two models you want to compare, and then calculate a ratio. That's it!
+Running a Bayesian ANOVA compares every combination of variables (main effects and interactions) to a null model. As a result, the BFs in this analysis don't tell you anything about the probability of one model relative to another. 
+
+In order to calculate a BF comparing two models, you need to extract the BFs for the two models you want to compare, and then calculate a ratio. That's it!
 
 ```{r, eval=FALSE}
 # Pull BF of model for tranditional ANOVA (not including group)
+# Preferred model
 bf_num <- bf_ean_center %>%
   dplyr::filter(.rownames == "chlabel + cond + chlabel:cond + ID") %>%
   pull(bf)
@@ -64,6 +71,7 @@ bf_num <- bf_ean_center %>%
 
 ```{r, eval=FALSE}
 # Pull BF of model including group
+# Alternative model
 bf_den <- bf_ean_center %>%
   dplyr::filter(.rownames == "chlabel + cond + chlabel:cond + 
                               group + chlabel:group + cond:group + c
@@ -71,9 +79,15 @@ bf_den <- bf_ean_center %>%
   pull(bf)
 ```
 
-The ratio of BFs gives you the probability of the preferred model (numerator) to the dispreferred model (denominator). In other words, if the ratio is 2, that means that the preferred model has a 2-to-1 chance of producing the actually observed data over the dispreferred model. This ratio would be reported as $BF_{10}$, while the opposite ratio would be reported as $BF_{01}$.
+The ratio between the BFs of the preferred and alternative models provides quantitative evidence for/against the model in the numerator relative to the model in the denominator
+
+For example, if the ratio equals 2, then the preferred model has a 2-to-1 likelihood of producing the observed data relative to the alternative model.
+
+In other words, while traditional hypothesis testing yields a binary significance test for a model, Bayesian hypothesis testing yields a continuous measure of support for/against a model.
 
 ```{r, eval=FALSE}
 # Calculate BF for comparison between models with/without group factor
 bf_ean_center_comp <- bf_num / bf_den
 ```
+
+This ratio (preferred/alternative) would be reported as $BF_{10}$, while the opposite ratio (alternative/preferred) would be reported as $BF_{01}$.

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Holly Zaharchuk" />
 
-<meta name="date" content="2021-03-10" />
+<meta name="date" content="2021-03-11" />
 
 <title>Bayes factor analysis example</title>
 
@@ -131,20 +131,24 @@ a.sourceLine {
 <section class="page-header">
 <h1 class="title toc-ignore project-name">Bayes factor analysis example</h1>
 <h4 class="author project-author">Holly Zaharchuk</h4>
-<h4 class="date project-date">March 10, 2021</h4>
+<h4 class="date project-date">March 11, 2021</h4>
 </section>
 
 
 
 <section class="main-content">
+<p>I calculated Bayes factors (BFs) corresponding to the four traditional ANOVAs in each time window (EAN, P600) and distribution (midline [Fz, Cz, Pz], lateral [LF, RF, LP, RP]). Below, I show the calculation for the EAN effect along the midline.</p>
+<p><a href="https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057">This article</a> was incredibly helpful for understanding how to implement the analysis with the <code>BayesFactor</code> package, and <a href="https://link.springer.com/article/10.3758/s13423-017-1323-7">this open access article</a> provides useful information on interpretation (see Table 1).</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load package for calculating Bayes factors</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BayesFactor)</span></code></pre></div>
 <p>The relevant variable names are:</p>
 <ul>
 <li>ID = participant ID number</li>
-<li>chlabel = electrode or channel labels (e.g., Pz)</li>
+<li>chlabel = individual electrodes or channels (e.g., Pz)</li>
 <li>group = participant group (Unmarked or Southern)</li>
 <li>cond = sentence condition (DM or SM)</li>
+<li>window = time window (EAN or P600)</li>
+<li>distribution = group of electrodes or channels (midline, lateral)</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert variables to factors (required by anovaBF function)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>erp_data <span class="ot">&lt;-</span> erp_data <span class="sc">%&gt;%</span></span>
@@ -152,7 +156,6 @@ a.sourceLine {
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">chlabel =</span> <span class="fu">as.factor</span>(chlabel),</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">group =</span> <span class="fu">as.factor</span>(group),</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">cond =</span> <span class="fu">as.factor</span>(cond))</span></code></pre></div>
-<p>I calculated BFs corresponding to the four traditional ANOVAs in each time window (2) and distribution (2). Below, I show the calculation for the EAN effect along the midline. <a href="https://psycnet.apa.org/doiLanding?doi=10.1037/met0000057">This article</a> was incredibly helpful for understanding how to implement the analysis with the <code>BayesFactor</code> package, and <a href="https://link.springer.com/article/10.3758/s13423-017-1323-7">this open access article</a> provides useful information on interpretation (see Table 1).</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run Bayesian ANOVA</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># EAN, midline, interaction among electrodes, groups, and conditions</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># anovaBF function also requires random factor for participants</span></span>
@@ -167,20 +170,26 @@ a.sourceLine {
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract all BFs, calculated for every term/interaction</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>bf_ean_center <span class="ot">&lt;-</span> <span class="fu">extractBF</span>(bf_ean_center) <span class="sc">%&gt;%</span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">name_rows</span>()</span></code></pre></div>
-<p>Running a Bayesian ANOVA compares every combination of variables (main effects and interactions) to a null model. As a result, the BFs in this analysis don’t tell you anything about the probability of one model relative to another. In order to calculate a BF comparing two models, you need to extract the BFs for the two models you want to compare, and then calculate a ratio. That’s it!</p>
+<p>Running a Bayesian ANOVA compares every combination of variables (main effects and interactions) to a null model. As a result, the BFs in this analysis don’t tell you anything about the probability of one model relative to another.</p>
+<p>In order to calculate a BF comparing two models, you need to extract the BFs for the two models you want to compare, and then calculate a ratio. That’s it!</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pull BF of model for tranditional ANOVA (not including group)</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>bf_num <span class="ot">&lt;-</span> bf_ean_center <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(.rownames <span class="sc">==</span> <span class="st">&quot;chlabel + cond + chlabel:cond + ID&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(bf)</span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Preferred model</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>bf_num <span class="ot">&lt;-</span> bf_ean_center <span class="sc">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(.rownames <span class="sc">==</span> <span class="st">&quot;chlabel + cond + chlabel:cond + ID&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(bf)</span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pull BF of model including group</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>bf_den <span class="ot">&lt;-</span> bf_ean_center <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(.rownames <span class="sc">==</span> <span class="st">&quot;chlabel + cond + chlabel:cond + </span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="st">                              group + chlabel:group + cond:group + c</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">                              hlabel:cond:group + ID&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(bf)</span></code></pre></div>
-<p>The ratio of BFs gives you the probability of the preferred model (numerator) to the dispreferred model (denominator). In other words, if the ratio is 2, that means that the preferred model has a 2-to-1 chance of producing the actually observed data over the dispreferred model. This ratio would be reported as <span class="math inline">\(BF_{10}\)</span>, while the opposite ratio would be reported as <span class="math inline">\(BF_{01}\)</span>.</p>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative model</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>bf_den <span class="ot">&lt;-</span> bf_ean_center <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(.rownames <span class="sc">==</span> <span class="st">&quot;chlabel + cond + chlabel:cond + </span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">                              group + chlabel:group + cond:group + c</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">                              hlabel:cond:group + ID&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(bf)</span></code></pre></div>
+<p>The ratio between the BFs of the preferred and alternative models provides quantitative evidence for/against the model in the numerator relative to the model in the denominator</p>
+<p>For example, if the ratio equals 2, then the preferred model has a 2-to-1 likelihood of producing the observed data relative to the alternative model.</p>
+<p>In other words, while traditional hypothesis testing yields a binary significance test for a model, Bayesian hypothesis testing yields a continuous measure of support for/against a model.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate BF for comparison between models with/without group factor</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>bf_ean_center_comp <span class="ot">&lt;-</span> bf_num <span class="sc">/</span> bf_den</span></code></pre></div>
+<p>This ratio (preferred/alternative) would be reported as <span class="math inline">\(BF_{10}\)</span>, while the opposite ratio (alternative/preferred) would be reported as <span class="math inline">\(BF_{01}\)</span>.</p>
 </section>
 
 
