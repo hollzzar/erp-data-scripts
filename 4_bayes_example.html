@@ -12,7 +12,7 @@
 
 <meta name="author" content="Holly Zaharchuk" />
 
-<meta name="date" content="2021-03-11" />
+<meta name="date" content="2021-03-13" />
 
 <title>Bayes factor analysis example</title>
 
@@ -131,7 +131,7 @@ a.sourceLine {
 <section class="page-header">
 <h1 class="title toc-ignore project-name">Bayes factor analysis example</h1>
 <h4 class="author project-author">Holly Zaharchuk</h4>
-<h4 class="date project-date">March 11, 2021</h4>
+<h4 class="date project-date">March 13, 2021</h4>
 </section>
 
 
@@ -181,8 +181,8 @@ a.sourceLine {
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative model</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>bf_den <span class="ot">&lt;-</span> bf_ean_center <span class="sc">%&gt;%</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(.rownames <span class="sc">==</span> <span class="st">&quot;chlabel + cond + chlabel:cond + </span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">                              group + chlabel:group + cond:group + c</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">                              hlabel:cond:group + ID&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">                              group + chlabel:group + cond:group + </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">                              chlabel:cond:group + ID&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(bf)</span></code></pre></div>
 <p>The ratio between the BFs of the preferred and alternative models provides quantitative evidence for/against the model in the numerator relative to the model in the denominator</p>
 <p>For example, if the ratio equals 2, then the preferred model has a 2-to-1 likelihood of producing the observed data relative to the alternative model.</p>

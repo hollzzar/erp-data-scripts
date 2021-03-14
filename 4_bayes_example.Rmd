@@ -74,8 +74,8 @@ bf_num <- bf_ean_center %>%
 # Alternative model
 bf_den <- bf_ean_center %>%
   dplyr::filter(.rownames == "chlabel + cond + chlabel:cond + 
-                              group + chlabel:group + cond:group + c
-                              hlabel:cond:group + ID") %>%
+                              group + chlabel:group + cond:group + 
+                              chlabel:cond:group + ID") %>%
   pull(bf)
 ```
 
